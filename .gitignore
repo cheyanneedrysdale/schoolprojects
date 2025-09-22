@@ -1,0 +1,7 @@
+# Rider
+.idea/
+*.s1n.iml
+
+#Build results
+bin/
+obj/
