@@ -1,5 +1,8 @@
+using System.Net.Mime;
 using COMP2139_ICE.Models;
 using Microsoft.AspNetCore.Mvc;
+using COMP2139_ICE.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace COMP2139_ICE.Controllers;
 
@@ -7,55 +10,42 @@ public class ProjectController : Controller
 
 {
 
+    private readonly ApplicationDbContext _context;
 
-private static List<Project> projects = new List<Project>();
-
-    public IActionResult Index()
-
+    public ProjectController(ApplicationDbContext context)
     {
-
-        if (projects.Count == 0)
-        {
-            projects.Add(new Project { ProjectId = 1, Name = "Project 1", Description = "this is project 1." });
-        }
-
-// add more projects here
-
-
-        return View(projects);
-
+        _context = context;
     }
-
-    public IActionResult Create()
-    {
-        return View();
-    }
-
-
-
-
-    public IActionResult Create(Project project)
-
-    {
-        project.ProjectId = projects.Count + 1;
-        projects.Add(project);
-
-        return RedirectToAction("Index");
-
-    }
-
     
 
-    public IActionResult Details(int id)
-
+    public IActionResult Index()
     {
-        var project = projects.FirstOrDefault(p => p.ProjectId == id);
+        var projects = _context.Projects.ToList();
+        return View(projects);
+    }
+    
+
+[HttpPost]
+public IActionResult Create(Project project)
+{
+    _context.Projects.Add(project);
+    _context.SaveChanges();
+    return RedirectToAction("Index");
+}
+
+
+
+public IActionResult Details(int id)
+
+{
+    var project = _context.Projects.FirstOrDefault(p => p.ProjectId == id);
         if (project == null)
         {
             return NotFound();
         }
 
         return View(project);
+
 
     }
 
