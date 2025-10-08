@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using COMP2139_ICE.Models;
 
-namespace COMP2139_ICE.Data
-{
+namespace COMP2139_ICE.Data;
+
     public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -10,6 +10,6 @@ namespace COMP2139_ICE.Data
         {
         }
 
+        public DbSet<ProjectTask> ProjectTasks { get; set; }
         public DbSet<Project> Projects { get; set; }
     }
-}

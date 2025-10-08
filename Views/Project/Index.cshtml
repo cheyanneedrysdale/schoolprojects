@@ -53,9 +53,10 @@
             <td>@project.Description</td>
             
             <td>
-                <a asp-action="Details" asp-route-id="@project.ProjectId">Details</a>
-                <a asp-action="Edit" asp-route-id="@project.ProjectId">Edit</a>
-                <a asp-action="Delete" asp-route-id="@project.ProjectId">Delete</a>
+                <a asp-controller="ProjectTask" asp-action="Index" asp-route-projectId="@project.ProjectId">view tasks</a> |
+                <a asp-action="Details" asp-route-id="@project.ProjectId">details</a> |
+                <a asp-action="Edit" asp-route-id="@project.ProjectId">edit</a> |
+                <a asp-action="Delete" asp-route-id="@project.ProjectId">delete</a>
             </td>
 
         </tr>

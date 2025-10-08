@@ -1,0 +1,36 @@
+@model IEnumerable<COMP2139_ICE.Models.ProjectTask>
+@{
+    ViewData["Title"] = "Tasks";
+    var projectId = (int)ViewBag.ProjectId;
+    var projectName = (string)ViewBag.ProjectName;
+}
+<h2>tasks for @projectName</h2>
+
+<p>
+    <a class="btn btn-primary" asp-action="Create" asp-route-projectId="@projectId">create task</a>
+    <a class="btn btn-secondary" asp-controller="Project" asp-action="Index">back to projects</a>
+</p>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>title</th>
+        <th>description</th>
+        <th style="width:200px;">Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var t in Model)
+    {
+        <tr>
+            <td>@t.Title</td>
+            <td>@t.Description</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@t.ProjectTaskId">details</a> |
+                <a asp-action="Edit" asp-route-id="@t.ProjectTaskId">edit</a> |
+                <a asp-action="Delete" asp-route-id="@t.ProjectTaskId">delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

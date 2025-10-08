@@ -24,16 +24,23 @@
     <div class="mb-3">
         <label asp-for="StartDate" class="form-label"></label>
         <input asp-for="StartDate" class="form-control" type="date" />
+        <span asp-validation-for="StartDate" class="text-danger"></span>
     </div>
     
     <div class="mb-3">
         <label asp-for="EndDate" class="form-label"></label>
         <input asp-for="EndDate" class="form-control" type="date" />
+        <span asp-validation-for="EndDate" class="text-danger"></span>
     </div>
     
     <div class="mb-3">
         <label asp-for="Status" class="form-label"></label>
-        <input asp-for="Status" class="form-control" />
+        <select asp-for="Status" class="form-control" >
+            <option>new</option>
+            <option>in progress</option>
+            <option>completed</option>
+        </select>
+        <span asp-validation-for="Status" class="text-danger"></span>
     </div>
     
     <button type="submit" class="btn btn-primary">save</button>

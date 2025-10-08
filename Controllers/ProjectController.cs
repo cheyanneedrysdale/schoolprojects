@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using System.Runtime.InteropServices.JavaScript;
 using COMP2139_ICE.Models;
 using Microsoft.AspNetCore.Mvc;
 using COMP2139_ICE.Data;
@@ -19,7 +20,7 @@ public class ProjectController : Controller
     }
     
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         var projects = _context.Projects.ToList();
         return View(projects);
@@ -27,88 +28,80 @@ public class ProjectController : Controller
 
 
     [HttpGet]
-    public IActionResult Create()
+    public IActionResult Create() => View();
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(Project project)
     {
-        return View();
-    }
-    
-[HttpPost]
-[ValidateAntiForgeryToken]
-public IActionResult Create(Project project)
-{
-    if (!ModelState.IsValid)
+        if (ModelState.IsValid)
+        {
+            if (project.StartDate.HasValue)
+                project.StartDate = DateTime.SpecifyKind(project.StartDate.Value, DateTimeKind.Utc);
+
+            if (project.EndDate.HasValue)
+                project.EndDate = DateTime.SpecifyKind(project.EndDate.Value, DateTimeKind.Utc);
+
+            _context.Add(project);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+        
         return View(project);
-    
-    _context.Projects.Add(project);
-    _context.SaveChanges();
-    return RedirectToAction("Index");
-}
-
-
-
-public IActionResult Details(int id)
-
+    }
+    [HttpGet]
+    public IActionResult Details(int id)
 {
     var project = _context.Projects.FirstOrDefault(p => p.ProjectId == id);
-        if (project == null)
-        {
-            return NotFound();
-        }
-
+        if (project == null)  return NotFound();
         return View(project);
-
-
     }
 
 [HttpGet]
 public IActionResult Edit(int? id)
 {
     if (id == null) return NotFound();
-
     var project = _context.Projects.FirstOrDefault(p => p.ProjectId == id.Value);
     if (project == null) return NotFound();
-
     return View(project);
-
 }
 
 [HttpPost]
 [ValidateAntiForgeryToken]
-public IActionResult Edit(int id, Project project)
+public async Task<IActionResult> Edit(int id, Project project)
 {
     if (id != project.ProjectId) return NotFound();
-    if (!ModelState.IsValid)
-    {
-        return View(project);
-    }
+    if (!ModelState.IsValid) return View(project);
 
+    if (project.StartDate.HasValue)
+        project.StartDate = DateTime.SpecifyKind(project.StartDate.Value, DateTimeKind.Utc);
+    if (project.EndDate.HasValue)
+        project.EndDate = DateTime.SpecifyKind(project.EndDate.Value, DateTimeKind.Utc);
+    
     _context.Update(project);
-    _context.SaveChanges();
+    await _context.SaveChangesAsync();
     return RedirectToAction(nameof(Index));
 }
 
 [HttpGet]
-[ValidateAntiForgeryToken]
 public IActionResult Delete(int? id)
 {
     if (id == null) return NotFound();
-
     var project = _context.Projects.FirstOrDefault(p => p.ProjectId == id.Value);
     if (project == null) return NotFound();
-
     return View(project);
 
 }
 
-[HttpPost]
+[HttpPost, ActionName("Delete")]
 [ValidateAntiForgeryToken]
-public IActionResult DeleteConfirmed(int id)
+public async Task<IActionResult> DeleteConfirmed(int id)
 {
-    var project = _context.Projects.FirstOrDefault(p => p.ProjectId == id);
+    var project = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectId == id);
     if (project != null)
     {
         _context.Projects.Remove(project);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 
     return RedirectToAction(nameof(Index));
