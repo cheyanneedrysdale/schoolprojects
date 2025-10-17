@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace COMP2139_ICE.Controllers;
 
+[Route("Project")] //localhost: 5090/Project
+
+
 public class ProjectController : Controller
 
 {
@@ -18,93 +21,200 @@ public class ProjectController : Controller
     {
         _context = context;
     }
+
+    
     
 
-    public async Task<IActionResult> Index()
+    [HttpGet("  ")]
+    public IActionResult Index()
     {
         var projects = _context.Projects.ToList();
         return View(projects);
     }
 
 
-    [HttpGet]
-    public IActionResult Create() => View();
-    
-    [HttpPost]
+    [HttpGet("Create")]
+    public IActionResult Create()
+    {
+        return View();
+    }
+
+
+
+    [HttpPost("Create")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Project project)
+    public IActionResult Create(Project project)
     {
         if (ModelState.IsValid)
         {
-            if (project.StartDate.HasValue)
-                project.StartDate = DateTime.SpecifyKind(project.StartDate.Value, DateTimeKind.Utc);
+// Convert to UTC before saving
+            project.StartDate = ToUtc(project.StartDate);
+            project.EndDate = ToUtc(project.EndDate);
 
-            if (project.EndDate.HasValue)
-                project.EndDate = DateTime.SpecifyKind(project.EndDate.Value, DateTimeKind.Utc);
-
-            _context.Add(project);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            _context.Projects.Add(project);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
         }
-        
+
         return View(project);
     }
-    [HttpGet]
+
+
+
+    [HttpGet("Details/{id:int}")]
     public IActionResult Details(int id)
-{
-    var project = _context.Projects.FirstOrDefault(p => p.ProjectId == id);
-        if (project == null)  return NotFound();
+    {
+        var project = _context.Projects.FirstOrDefault(p => p.ProjectId == id);
+        if (project == null)
+        {
+            return NotFound();
+        }
+
         return View(project);
     }
 
-[HttpGet]
-public IActionResult Edit(int? id)
-{
-    if (id == null) return NotFound();
-    var project = _context.Projects.FirstOrDefault(p => p.ProjectId == id.Value);
-    if (project == null) return NotFound();
-    return View(project);
-}
 
-[HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> Edit(int id, Project project)
-{
-    if (id != project.ProjectId) return NotFound();
-    if (!ModelState.IsValid) return View(project);
 
-    if (project.StartDate.HasValue)
-        project.StartDate = DateTime.SpecifyKind(project.StartDate.Value, DateTimeKind.Utc);
-    if (project.EndDate.HasValue)
-        project.EndDate = DateTime.SpecifyKind(project.EndDate.Value, DateTimeKind.Utc);
-    
-    _context.Update(project);
-    await _context.SaveChangesAsync();
-    return RedirectToAction(nameof(Index));
-}
 
-[HttpGet]
-public IActionResult Delete(int? id)
-{
-    if (id == null) return NotFound();
-    var project = _context.Projects.FirstOrDefault(p => p.ProjectId == id.Value);
-    if (project == null) return NotFound();
-    return View(project);
-
-}
-
-[HttpPost, ActionName("Delete")]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> DeleteConfirmed(int id)
-{
-    var project = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectId == id);
-    if (project != null)
+    [HttpGet("Edit/{id:int}")]
+    public IActionResult Edit(int? id)
     {
-        _context.Projects.Remove(project);
-        await _context.SaveChangesAsync();
+        var project = _context.Projects.Find(id);
+        if (project == null)
+        {
+            return NotFound();
+        }
+
+        return View(project);
     }
 
-    return RedirectToAction(nameof(Index));
+
+
+
+    [HttpPost("Edit/{id:int}")]
+    [ValidateAntiForgeryToken]
+    public IActionResult Edit(int id, [Bind("ProjectId", "Name", "Description")] Project project)
+    {
+        if (id != project.ProjectId)
+        {
+            return NotFound();
+        }
+
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                _context.Projects.Update(project);
+                _context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ProjectExists(project.ProjectId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        return View(project);
+
+         bool ProjectExists(int id)
+        {
+            return _context.Projects.Any(e => e.ProjectId == id);
+        }
+
+
+        project.StartDate = ToUtc(project.StartDate);
+        project.EndDate = ToUtc(project.EndDate);
+    }
+
+
+    private static DateTime ToUtc(DateTime input)
+    {
+        if (input.Kind == DateTimeKind.Utc) return input;
+        if (input.Kind == DateTimeKind.Unspecified)
+            return DateTime.SpecifyKind(input, DateTimeKind.Local).ToUniversalTime();
+        return input.ToUniversalTime();
+    }
+
+
+    [HttpGet("Delete/{id:int}")]
+    public IActionResult Delete(int id)
+    {
+        var project = _context.Projects.FirstOrDefault(p => p.ProjectId == id);
+        if (project == null)
+        {
+            return NotFound();
+        }
+        return View(project);
+
+    }
+
+    [HttpPost("DeleteConfirmed/{id:int}")]
+    [ValidateAntiForgeryToken]
+    public IActionResult DeleteConfirmed(int id)
+    {
+        var project = _context.Projects.Find(id);
+        if (project != null)
+        {
+            _context.Projects.Remove(project);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
+        return View(project);
+}
+    
+    // Lab 6 - Project Search Functionality
+// Custom route for search functionality
+// Accessible at /Projects/Search/{searchString?}
+[HttpGet("Search/{searchString?}")]
+public async Task<IActionResult> Search(string searchString)
+{
+    // Fetch all projects from the database as an IQueryable collection
+    // IQueryable allows us to apply filters before executing the database query
+    var projectsQuery = _context.Projects.AsQueryable();
+
+    // Check if a search string was provided (avoids null or empty search issues)
+    bool searchPerformed = !string.IsNullOrWhiteSpace(searchString);
+
+    if (searchPerformed)
+    {
+        // Convert searchString to lowercase to make the search case-insensitive
+        searchString = searchString.ToLower();
+
+        // Apply filtering: Match project name or description
+        // Description is checked for null before calling ToLower() to prevent NullReferenceException
+        projectsQuery = projectsQuery.Where(p =>
+            p.Name.ToLower().Contains(searchString) ||
+            (p.Description != null && p.Description.ToLower().Contains(searchString)));
+    }
+
+    // ❗ WHY ASYNC? ❗
+    // Asynchronous execution means this method does not block the thread while waiting for the database.
+    // Instead of blocking, ASP.NET Core can process other incoming requests while waiting for the result.
+    // This improves scalability and application responsiveness.
+    
+    // Execute the query asynchronously using `ToListAsync()`
+    var projects = await projectsQuery.ToListAsync();
+    
+    // ❗ HOW ASYNC WORKS HERE? ❗
+    // `await` releases the current thread while waiting for the query execution to complete.
+    // When the database call finishes, execution resumes on this method at this point.
+
+    // Store search metadata for the view
+    ViewData["SearchPerformed"] = searchPerformed;
+    ViewData["SearchString"] = searchString;
+
+    // Return the filtered list to the Index view (reusing existing UI)
+    return View("Index", projects);
 }
 
+    
 }

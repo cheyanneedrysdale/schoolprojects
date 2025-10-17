@@ -6,6 +6,10 @@
 @{
 
     ViewData["Title"] = "Projects";
+    
+    // LAB 6: - search parameters
+    bool searchPerformed = ViewData["SearchPerformed"] as bool? ?? false;
+    string searchString = ViewData["SearchString"] as string;
 
 }
 
@@ -73,6 +77,16 @@ else
 
 {
 
-<p>No projects available.</p>
+    // LAB 6: CONDITIONAL
 
+    if (searchPerformed)
+    {
+        <p>no project names with name "@searchString" were found. </p>
+    }
+    else
+    {
+
+        <p>No projects available.</p>
+
+    }
 }

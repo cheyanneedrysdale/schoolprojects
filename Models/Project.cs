@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace COMP2139_ICE.Models;
@@ -20,14 +21,24 @@ public class Project
 
 
     [DataType(DataType.Date)]
-    public DateTime? StartDate { get; set; }
+    public DateTime StartDate { get; set; }
 
 
 
 
     [DataType(DataType.Date)]
-    public DateTime? EndDate { get; set; }
+    public DateTime EndDate { get; set; }
     
     [Required]
     public string? Status { get; set; }
+
+
+// week 6
+
+    public List<ProjectTask>? Tasks { get; set; } = new();
+
 }
+
+
+
+
