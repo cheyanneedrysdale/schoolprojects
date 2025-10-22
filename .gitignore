@@ -1,3 +1,4 @@
+
 # Rider
 .idea/
 *.s1n.iml
@@ -5,3 +6,10 @@
 #Build results
 bin/
 obj/
+
+.DS_Store
+.vs/
+*.user
+*.suo
+
+
