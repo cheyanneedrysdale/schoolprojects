@@ -1,0 +1,104 @@
+@model IEnumerable<Assignment1.Models.Event>
+@{
+    ViewData["Title"] = "Events";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+
+
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <label for="search" class="form-label">search title</label>
+        <input id="search" name="search" value="@ViewBag.Search"
+               class="form-control" placeholder="type part of a title..."/>
+    </div>
+
+    <div class="col-md-3">
+        <label for="categoryId" class="form-label">category</label>
+        <select id="categoryId" name="categoryId" asp-items="ViewBag.CategoryId"
+                class="form-select">
+            <option value="">all categories</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <label for="from" class="form-label">from date</label>
+        <input id="from" type="date" name="from" value="@ViewBag.From"
+               class="form-control"/>
+    </div>
+
+    <div class="col-md-2">
+        <label for="to" class="form-label">to date</label>
+        <input id="to" type="date" name="to" value="@ViewBag.To"
+               class="form-control"/>
+    </div>
+
+
+    <div class="col-md-2">
+        <label for="sort" class="form-label">sort by</label>
+        @{
+            var s = (string)(ViewBag.Sort ?? "date_asc");
+        }
+        
+        <select id="sort" name="sort" class="form-select">
+            @if (s == "title_asc")  { <option value="title_asc" selected>title A–Z</option> } else { <option value="title_asc">title A–Z</option> }
+            @if (s == "title_desc") { <option value="title_desc" selected>title Z–A</option> } else { <option value="title_desc">title Z–A</option> }
+
+            @if (s == "date_asc")   { <option value="date_asc" selected>date (oldest first)</option> } else { <option value="date_asc">date (oldest first)</option> }
+            @if (s == "date_desc")  { <option value="date_desc" selected>date (newest first)</option> } else { <option value="date_desc">date (newest first)</option> }
+
+            @if (s == "price_asc")  { <option value="price_asc" selected>price (lowest first)</option> } else { <option value="price_asc">price (lowest first)</option> }
+            @if (s == "price_desc") { <option value="price_desc" selected>price (highest first)</option> } else { <option value="price_desc">price (highest first)</option> }
+            
+        </select>
+    </div>
+
+    <div class="col-12 mt-2">
+        <button class="btn btn-primary">apply filters</button>
+        <a asp-action="Index" class="btn btn-outline-secondary ms-2">reset</a>
+
+    </div>
+</form>
+
+<table class="table table-striped">
+    <thead>
+
+    <tr>
+        <th>title</th>
+        <th>category</th>
+        <th>date & time</th>
+        <th>price</th>
+        <th>availability</th>
+        <th></th>
+
+    </tr>
+    </thead>
+
+
+    <tbody>
+    @foreach (var e in Model)
+    {
+        <tr>
+            <td>@e.Title</td>
+            <td>@e.Category?.Name</td>
+            <td>@e.StartsAt.ToString("yyyy-MM-dd HH:mm")</td>
+            <td>@e.TicketPrice.ToString("C")</td>
+            <td>@e.AvailableTickets</td>
+
+
+            <td class="text-nowrap">
+                <a asp-controller="Purchase"
+                   asp-action="Create"
+                   asp-route-eventId="@e.EventId"
+                   class="btn btn-sm btn-primary">buy tickets</a>
+            </td>
+        </tr>
+
+
+        
+        
+    }
+    </tbody>
+</table>

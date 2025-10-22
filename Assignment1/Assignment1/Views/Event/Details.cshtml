@@ -1,0 +1,28 @@
+@model Assignment1.Models.Event
+@{
+    ViewData["Title"] = "Event Details";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<dl class="row">
+    <dt class="col-sm-3">title</dt>
+    <dd class="col-sm-9">@Model.Title</dd>
+
+    <dt class="col-sm-3">category</dt>
+    <dd class="col-sm-9">@Model.Category?.Name</dd>
+
+    <dt class="col-sm-3">date & time</dt>
+    <dd class="col-sm-9">@Model.StartsAt.ToString("yyyy-MM-dd HH:mm")</dd>
+
+    <dt class="col-sm-3">price</dt>
+    <dd class="col-sm-9">@Model.TicketPrice.ToString("C")</dd>
+
+    <dt class="col-sm-3">availability</dt>
+    <dd class="col-sm-9">@Model.AvailableTickets</dd>
+</dl>
+
+<p class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model.EventId" class="btn btn-primary">edit</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">go back!</a>
+</p>

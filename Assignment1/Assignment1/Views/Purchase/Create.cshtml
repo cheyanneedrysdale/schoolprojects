@@ -1,0 +1,41 @@
+@model Assignment1.Models.Purchase
+@{
+    ViewData["Title"] = "Guest Purchase";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Create" method="post" class="row g-3">
+    @Html.AntiForgeryToken()
+
+    <div class="col-md-6">
+        <label asp-for="GuestName" class="form-label"></label>
+        <input asp-for="GuestName" class="form-control" />
+        <span asp-validation-for="GuestName" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="GuestEmail" class="form-label"></label>
+        <input asp-for="GuestEmail" class="form-control" />
+        <span asp-validation-for="GuestEmail" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-8">
+        <label for="EventId" class="form-label">event</label>
+        <select id="EventId" name="EventId" class="form-select" asp-items="ViewBag.EventId"></select>
+    </div>
+
+    <div class="col-md-4">
+        <label for="Quantity" class="form-label">quantity</label>
+        <input id="Quantity" name="Quantity" type="number" class="form-control" min="1" value="1" />
+    </div>
+
+    <div class="col-12">
+        <button class="btn btn-primary">review purchase</button>
+        <a asp-controller="Event" asp-action="Index" class="btn btn-outline-secondary ms-2">cancel</a>
+    </div>
+</form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

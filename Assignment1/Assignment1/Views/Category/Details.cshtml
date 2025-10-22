@@ -1,0 +1,41 @@
+@model Assignment1.Models.Category
+
+@{
+    ViewData["Title"] = "Category Details";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<dl class="row">
+    <dt class="col-sm-3">name</dt>
+    <dd class="col-sm-9">@Model.Name</dd>
+
+    <dt class="col-sm-3">description</dt>
+    <dd class="col-sm-9">@Model.Description</dd>
+
+    <dt class="col-sm-3">events in this category</dt>
+    <dd class="col-sm-9">
+        @if (Model.Events != null && Model.Events.Any())
+        {
+            <ul class="mb-0">
+                @foreach (var e in Model.Events.OrderBy(e => e.StartsAt))
+                {
+                    <li>
+                        <strong>@e.Title</strong>
+                        — @e.StartsAt.ToString("yyyy-MM-dd HH:mm")
+                        — $@e.TicketPrice
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <em>no events yet!</em>
+        }
+    </dd>
+</dl>
+
+<p class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model.CategoryId" class="btn btn-primary">edit</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">take me back!</a>
+</p>

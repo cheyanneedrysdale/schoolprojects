@@ -1,0 +1,163 @@
+@model Assignment1.Models.Dashboard
+@using Assignment1.Models
+
+@{
+    ViewData["Title"] = "Event Overview";
+    var events = ViewBag.Events as IEnumerable<Event> ?? Enumerable.Empty<Event>();
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<h4>Manage Events</h4>
+
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="p-3 border rounded bg-light">
+            <h5 class="mb-1">total events</h5>
+            <div class="display-6">@Model.TotalEvents</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="p-3 border rounded bg-light">
+            <h5 class="mb-1">total categories</h5>
+            <div class="display-6">@Model.TotalCategories</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="p-3 border rounded bg-light">
+            <h5 class="mb-1">low ticket threshold</h5>
+            <div class="display-6">@Model.LowTicketThreshold</div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<hr />
+
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>title</th>
+        <th>category</th>
+        <th>date & time</th>
+        <th>price</th>
+        <th>availability</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var e in events)
+    {
+        <tr>
+            <td>@e.Title</td>
+            <td>@e.Category?.Name</td>
+            <td>@e.StartsAt.ToString("yyyy-MM-dd HH:mm")</td>
+            <td>@e.TicketPrice.ToString("C")</td>
+            <td>@e.AvailableTickets</td>
+            <td class="text-nowrap">
+                <a class="btn btn-outline-secondary btn-sm" asp-controller="Event" asp-action="Details" asp-route-id="@e.EventId">details</a>
+                <a class="btn btn-primary btn-sm" asp-controller="Event" asp-action="Edit" asp-route-id="@e.EventId">edit</a>
+                <a class="btn btn-danger btn-sm" asp-controller="Event" asp-action="Delete" asp-route-id="@e.EventId">delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<div class="mb-3 d-flex justify-content-start">
+    <a asp-controller="Event" asp-action="Create" class="btn btn-success">create new event</a>
+</div>
+
+<h4 class="mb-3">low ticket events (less than @Model.LowTicketThreshold): @Model.LowTicketCount</h4>
+@if (Model.LowTicketEvents.Any())
+{
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>title</th>
+            <th>category</th>
+            <th>date & time</th>
+            <th>availability</th>
+            <th>price</th>
+            <th></th>
+        </tr>
+        </thead>
+
+        <tbody>
+        @foreach (var e in Model.LowTicketEvents)
+        {
+            <tr>
+                <td>@e.Title</td>
+                <td>@e.Category?.Name</td>
+                <td>@e.StartsAt.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@e.AvailableTickets</td>
+                <td>@e.TicketPrice.ToString("C")</td>
+                <td class="text-nowrap">
+                    <a asp-controller="Event" asp-action="Details" asp-route-id="@e.EventId" class="btn btn-sm btn-outline-secondary">details</a>
+                    <a asp-controller="Event" asp-action="Edit" asp-route-id="@e.EventId" class="btn btn-sm btn-outline-primary">edit</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+<div class="alert alert-success">no low-ticket events at the moment!</div>
+}
+
+
+@{
+    var categories = ViewBag.Categories as IEnumerable<Category> ?? Enumerable.Empty<Category>();
+}
+
+<hr />
+<h4>manage categories</h4>
+
+<div class="mb-3">
+    <a class="btn btn-primary" asp-controller="Category" asp-action="Create">add new category</a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>category name</th>
+        <th>description</th>
+        <th>event count</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var c in categories)
+    {
+        <tr>
+            <td>@c.Name</td>
+            <td>@c.Description</td>
+            <td>@(c.Events?.Count ?? 0)</td>
+
+            <td class="text-nowrap">
+
+                <a class="btn btn-sm btn-outline-secondary"
+                   asp-controller="Category" asp-action="Details" asp-route-id="@c.CategoryId">details</a>
+
+                <a class="btn btn-sm btn-outline-primary"
+                   asp-controller="Category" asp-action="Edit" asp-route-id="@c.CategoryId">edit</a>
+
+                <a class="btn btn-sm btn-outline-danger"
+                   asp-controller="Category" asp-action="Delete" asp-route-id="@c.CategoryId">delete</a>
+
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<p class="mt-3">
+    <a asp-controller="Event" asp-action="Index" class="btn btn-outline-secondary">take me back to Events!</a>
+</p>

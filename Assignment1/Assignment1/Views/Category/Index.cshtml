@@ -1,0 +1,47 @@
+@model IEnumerable<Assignment1.Models.Category>
+
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">add new category</a>
+</p>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input name="search" value="@ViewBag.Search" class="form-control" placeholder="Search by name..." />
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-outline-primary">search</button>
+        <a asp-action="Index" class="btn btn-outline-secondary ms-2">reset</a>
+    </div>
+</form>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>category name</th>
+        <th>description</th>
+        <th>event count</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var c in Model)
+    {
+        <tr>
+            <td>@c.Name</td>
+            <td>@c.Description</td>
+            <td>@(c.Events?.Count ?? 0)</td>
+            <td class="text-nowrap">
+                <a asp-action="Details" asp-route-id="@c.CategoryId" class="btn btn-sm btn-outline-secondary">details</a>
+                <a asp-action="Edit" asp-route-id="@c.CategoryId" class="btn btn-sm btn-outline-primary">edit</a>
+                <a asp-action="Delete" asp-route-id="@c.CategoryId" class="btn btn-sm btn-outline-danger">delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

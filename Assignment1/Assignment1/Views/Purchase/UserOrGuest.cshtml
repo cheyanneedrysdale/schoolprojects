@@ -1,0 +1,59 @@
+@{
+    ViewData["Title"] = "login or continue as guest";
+    var eventId = ViewBag.EventId as int?;
+}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height:70vh;">
+    <div class="card shadow-sm" style="max-width:480px; width:100%;">
+        <div class="card-body p-4">
+            <h4 class="mb-3">login</h4>
+
+
+            <form asp-controller="Event" asp-action="Index" method="get">
+                <div class="mb-3">
+                    <label class="form-label">email or username</label>
+                    <input name="Username" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">password</label>
+                    <input name="Password" type="password" class="form-control" />
+                </div>
+
+
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="RememberMe" id="rememberMe" />
+                        <label class="form-check-label" for="rememberMe">remember me</label>
+                    </div>
+
+                    <a asp-controller="Purchase" asp-action="GuestPurchase" class="small">forgot password?</a>
+                </div>
+
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">login</button>
+                </div>
+            </form>
+
+            <hr class="my-4" />
+
+            <div class="d-grid">
+                @* Guest button goes directly to GuestPurchase *@
+                @if (eventId.HasValue)
+                {
+                    <a class="btn btn-primary" asp-controller="Purchase" asp-action="Create" asp-route-eventId="@eventId">
+                        continue as guest
+                    </a>
+                }
+                else
+                {
+                    <a class="btn btn-primary" asp-controller="Purchase" asp-action="Create">
+                        continue as guest
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,30 @@
+@model Assignment1.Models.Event
+@{
+    ViewData["Title"] = "Delete Event";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="alert alert-warning">
+    are you sure you want to delete <strong>@Model.Title</strong>?!
+</div>
+
+<dl class="row">
+
+    <dt class="col-sm-3">category</dt>
+    <dd class="col-sm-9">@Model.Category?.Name</dd>
+
+    <dt class="col-sm-3">date & time</dt>
+    <dd class="col-sm-9">@Model.StartsAt.ToString("yyyy-MM-dd HH:mm")</dd>
+
+</dl>
+
+<form asp-action="Delete" method="post">
+
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="EventId"/>
+
+    <button class="btn btn-danger" type="submit">delete</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">cancel</a>
+
+</form>
